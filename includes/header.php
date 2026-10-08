@@ -39,7 +39,12 @@ $base       = $base       ?? '';
             <ul>
                 <li><a href="<?= $base ?>index.php" class="<?= $activePage === 'home'  ? 'active' : '' ?>">الرئيسية</a></li>
                 <li><a href="<?= $base ?>tours.php" class="<?= $activePage === 'tours' ? 'active' : '' ?>">الجولات</a></li>
-                <li><a href="<?= $base ?>admin/login.php" class="<?= $activePage === 'login' ? 'active' : '' ?>">دخول المشرفات</a></li>
+                <?php if (is_admin()): ?>
+                    <li><a href="<?= $base ?>admin/dashboard.php" class="<?= $activePage === 'dashboard' ? 'active' : '' ?>">لوحة التحكم</a></li>
+                    <li><a href="<?= $base ?>admin/logout.php">تسجيل الخروج</a></li>
+                <?php else: ?>
+                    <li><a href="<?= $base ?>admin/login.php" class="<?= $activePage === 'login' ? 'active' : '' ?>">دخول المشرفات</a></li>
+                <?php endif; ?>
             </ul>
             <button class="theme-toggle" id="themeToggle" aria-label="الوضع الليلي">🌙</button>
         </nav>
