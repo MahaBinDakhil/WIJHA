@@ -250,7 +250,6 @@ textarea.form-control { min-height: 110px; resize: vertical; }
 /* =====================================================
    تنسيقات الصفحات — كل وحدة تحت عنوانها
    ===================================================== */
-
 /* ===== الجزء 1: الرئيسية + الجولات + الدخول ===== */
 
 /* --- الرئيسية: السلايدر --- */
@@ -346,6 +345,39 @@ body.dark .eyebrow { color: #a9c98c; }
     .slide-content p { font-size: 1rem; }
 }
 
+/* --- صفحة الجولات --- */
+.page-banner {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: #fff; padding: 56px 0 48px;
+}
+.page-banner p { opacity: .85; margin-top: 6px; }
+.filters {
+    display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 12px;
+    margin-bottom: 16px;
+}
+.type-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+.chip {
+    padding: 8px 20px; border-radius: 999px; cursor: pointer;
+    border: 1.5px solid var(--border); background: var(--surface); color: var(--text);
+    font-family: inherit; font-size: .95rem; font-weight: 500; transition: all .2s;
+}
+.chip:hover { border-color: var(--primary); }
+.chip.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+.results-count { margin-bottom: 18px; }
+.card-img .badge-full, .card-img .badge-few { right: auto; left: 12px; }
+.badge-full { background: var(--danger); color: #fff; }
+.badge-few  { background: #f3d9a4; color: #6b4a0e; }
+.tour-card.hide { display: none; }
+.empty-state { text-align: center; padding: 60px 20px; }
+.empty-state > span { font-size: 3rem; display: block; margin-bottom: 8px; }
+.empty-state .btn { margin-top: 16px; }
+
+@media (max-width: 768px) {
+    .filters { grid-template-columns: 1fr 1fr; }
+    .filter-search { grid-column: 1 / -1; }
+    .page-banner { padding: 40px 0 34px; }
+}
+
 /* --- صفحة الدخول --- */
 .login-wrap {
     display: grid; grid-template-columns: 1fr 1fr;
@@ -398,7 +430,6 @@ body.dark .stat-card strong { color: #a9c98c; }
     .login-visual { min-height: 180px; }
     .login-form { padding: 28px 22px; }
 }
-
 
 /* ===== الجزء 2: تفاصيل الجولة + الحجز ===== */
 
