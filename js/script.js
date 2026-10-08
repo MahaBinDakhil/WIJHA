@@ -119,23 +119,74 @@ document.addEventListener('DOMContentLoaded', function () {
         if (slides.length > 1) startAuto();
     }
 
-    /* (لاحقاً هنا: فلترة الجولات) */
+    /* --- فلترة وترتيب الجولات --- */
+    const toursGrid = document.getElementById('toursGrid');
 
-    /* ===== الجزء 2: تفاصيل الجولة + الحجز =====
-       المطلوب هنا:
-       - التحقق من نموذج الحجز (الجوال 05xxxxxxxx، الإيميل، عدد الأشخاص ≤ المقاعد)
-       - حساب السعر الإجمالي مباشرة (السعر × عدد الأشخاص)
-       ملاحظة: لإظهار رسالة خطأ تحت حقل:
-         input.classList.add('invalid')   ← يظهر .error-msg اللي بعده
-         input.classList.remove('invalid')
-    */
+    if (toursGrid) {
+        const cards        = Array.from(toursGrid.querySelectorAll('.tour-card'));
+        const searchInput  = document.getElementById('searchInput');
+        const cityFilter   = document.getElementById('cityFilter');
+        const sortSelect   = document.getElementById('sortSelect');
+        const chips        = document.querySelectorAll('.chip');
+        const resultsCount = document.getElementById('resultsCount');
+        const emptyState   = document.getElementById('emptyState');
+        let selectedType   = 'all';
 
+        function applyFilters() {
+            const search = searchInput.value.trim().toLowerCase();
+            const city   = cityFilter.value;
+            let visible  = 0;
 
-    /* ===== الجزء 3: لوحة التحكم + إدارة الجولات =====
-       المطلوب هنا:
-       - رسالة تأكيد قبل الحذف (confirm)
-       - التحقق من نماذج الإضافة والتعديل
-       - معاينة الصورة قبل الرفع
-    */
+            cards.forEach(function (card) {
+                // كل شرط لازم يتحقق عشان البطاقة تظهر
+                const matchSearch = card.dataset.title.toLowerCase().includes(search);
+                const matchCity   = city === 'all' || card.dataset.city === city;
+                const matchType   = selectedType === 'all' || card.dataset.type === selectedType;
+
+                const show = matchSearch && matchCity && matchType;
+                card.classList.toggle('hide', !show);
+                if (show) visible++;
+            });
+
+            resultsCount.textContent = 'عدد النتائج: ' + visible + ' من ' + cards.length;
+            emptyState.hidden = visible > 0;
+        }
+
+        function applySort() {
+            const sortBy = sortSelect.value;
+            const sorted = cards.slice().sort(function (a, b) {
+                if (sortBy === 'price-asc')  return a.dataset.price - b.dataset.price;
+                if (sortBy === 'price-desc') return b.dataset.price - a.dataset.price;
+                return a.dataset.date.localeCompare(b.dataset.date);   // الأقرب موعداً
+            });
+            // نرجّع البطاقات للصفحة بالترتيب الجديد
+            sorted.forEach(function (card) { toursGrid.appendChild(card); });
+        }
+
+        // الأحداث
+        searchInput.addEventListener('input', applyFilters);
+        cityFilter.addEventListener('change', applyFilters);
+        sortSelect.addEventListener('change', applySort);
+
+        chips.forEach(function (chip) {
+            chip.addEventListener('click', function () {
+                chips.forEach(function (c) { c.classList.remove('active'); });
+                chip.classList.add('active');
+                selectedType = chip.dataset.type;
+                applyFilters();
+            });
+        });
+
+        document.getElementById('resetFilters').addEventListener('click', function () {
+            searchInput.value = '';
+            cityFilter.value  = 'all';
+            selectedType      = 'all';
+            chips.forEach(function (c) { c.classList.toggle('active', c.dataset.type === 'all'); });
+            applyFilters();
+        });
+
+        applyFilters();   // أول ما تفتح الصفحة (عشان لو جاية من الرئيسية بمدينة محددة)
+    }
+    
 
 });
