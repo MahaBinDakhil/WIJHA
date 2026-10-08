@@ -1,14 +1,14 @@
+
 /* =====================================================
-   وِجهة — ملف JavaScript المشترك
-   -----------------------------------------------------
-   كل وحدة تضيف كودها تحت عنوان جزئها في آخر الملف.
+   WIJHA - Shared JavaScript File
    ===================================================== */
 
 document.addEventListener('DOMContentLoaded', function () {
 
-    /* ---------- مشترك: قائمة الجوال ---------- */
+    /* ---------- Mobile Navigation ---------- */
+
     const menuToggle = document.getElementById('menuToggle');
-    const mainNav    = document.getElementById('mainNav');
+    const mainNav = document.getElementById('mainNav');
 
     if (menuToggle && mainNav) {
         menuToggle.addEventListener('click', function () {
@@ -18,245 +18,500 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-/* ===== الجزء 1: الرئيسية + الجولات + الدخول ===== */
+    /* =====================================================
+       Part 1: Home, Tours, and Login
+       ===================================================== */
 
-    /* --- الوضع الليلي (يتذكر اختيارك حتى لو قفلتي الصفحة) --- */
+    /* ---------- Dark Mode ---------- */
+
     const themeToggle = document.getElementById('themeToggle');
 
     function applyTheme(isDark) {
         document.body.classList.toggle('dark', isDark);
-        if (themeToggle) themeToggle.textContent = isDark ? '☀️' : '🌙';
+
+        if (themeToggle) {
+            themeToggle.textContent = isDark ? '☀️' : '🌙';
+        }
     }
 
     let savedTheme = null;
-    try { savedTheme = localStorage.getItem('wijha-theme'); } catch (e) {}
+
+    try {
+        savedTheme = localStorage.getItem('wijha-theme');
+    } catch (error) {
+        // Local storage may be unavailable.
+    }
+
     applyTheme(savedTheme === 'dark');
 
     if (themeToggle) {
         themeToggle.addEventListener('click', function () {
             const isDark = !document.body.classList.contains('dark');
+
             applyTheme(isDark);
-            try { localStorage.setItem('wijha-theme', isDark ? 'dark' : 'light'); } catch (e) {}
+
+            try {
+                localStorage.setItem(
+                    'wijha-theme',
+                    isDark ? 'dark' : 'light'
+                );
+            } catch (error) {
+                // Ignore local storage errors.
+            }
         });
     }
 
-    /* --- نموذج الدخول: التحقق قبل الإرسال --- */
+    /* ---------- Login Form Validation ---------- */
+
     const loginForm = document.getElementById('loginForm');
 
     if (loginForm) {
         const fields = [
             document.getElementById('username'),
             document.getElementById('password')
-        ];
+        ].filter(Boolean);
 
         loginForm.addEventListener('submit', function (event) {
             let valid = true;
+
             fields.forEach(function (input) {
                 if (input.value.trim() === '') {
-                    input.classList.add('invalid');   // يظهر رسالة الخطأ تحته
+                    input.classList.add('invalid');
                     valid = false;
                 } else {
                     input.classList.remove('invalid');
                 }
             });
-            if (!valid) event.preventDefault();       // يوقف الإرسال
+
+            if (!valid) {
+                event.preventDefault();
+            }
         });
 
-        // تختفي رسالة الخطأ أول ما تبدأ تكتب
         fields.forEach(function (input) {
             input.addEventListener('input', function () {
-                if (input.value.trim() !== '') input.classList.remove('invalid');
+                if (input.value.trim() !== '') {
+                    input.classList.remove('invalid');
+                }
             });
         });
 
-        // زر إظهار/إخفاء كلمة المرور
+        /* ---------- Password Visibility Toggle ---------- */
+
         const togglePassword = document.getElementById('togglePassword');
-        const passwordInput  = document.getElementById('password');
-        togglePassword.addEventListener('click', function () {
-            const show = passwordInput.type === 'password';
-            passwordInput.type = show ? 'text' : 'password';
-            togglePassword.textContent = show ? '🙈' : '👁';
-        });
+        const passwordInput = document.getElementById('password');
+
+        if (togglePassword && passwordInput) {
+            togglePassword.addEventListener('click', function () {
+                const show = passwordInput.type === 'password';
+
+                passwordInput.type = show ? 'text' : 'password';
+                togglePassword.textContent = show ? '🙈' : '👁';
+            });
+        }
     }
 
-    /* --- سلايدر الرئيسية --- */
+    /* ---------- Home Page Slider ---------- */
+
     const slider = document.getElementById('heroSlider');
 
     if (slider) {
         const slides = slider.querySelectorAll('.slide');
-        const dots   = slider.querySelectorAll('.dot');
-        let current  = 0;
+        const dots = slider.querySelectorAll('.dot');
+        let current = 0;
         let timer;
 
         function showSlide(index) {
-            // نلف: بعد آخر شريحة نرجع للأولى، وقبل الأولى نروح للأخيرة
+            if (slides.length === 0) return;
+
             current = (index + slides.length) % slides.length;
-            slides.forEach(function (s, i) { s.classList.toggle('active', i === current); });
-            dots.forEach(function (d, i)   { d.classList.toggle('active', i === current); });
+
+            slides.forEach(function (slide, i) {
+                slide.classList.toggle('active', i === current);
+            });
+
+            dots.forEach(function (dot, i) {
+                dot.classList.toggle('active', i === current);
+            });
         }
 
         function startAuto() {
             clearInterval(timer);
-            timer = setInterval(function () { showSlide(current + 1); }, 5000);  // كل 5 ثواني
+
+            if (slides.length > 1) {
+                timer = setInterval(function () {
+                    showSlide(current + 1);
+                }, 5000);
+            }
         }
 
         const nextBtn = document.getElementById('sliderNext');
         const prevBtn = document.getElementById('sliderPrev');
-        if (nextBtn) nextBtn.addEventListener('click', function () { showSlide(current + 1); startAuto(); });
-        if (prevBtn) prevBtn.addEventListener('click', function () { showSlide(current - 1); startAuto(); });
+
+        if (nextBtn) {
+            nextBtn.addEventListener('click', function () {
+                showSlide(current + 1);
+                startAuto();
+            });
+        }
+
+        if (prevBtn) {
+            prevBtn.addEventListener('click', function () {
+                showSlide(current - 1);
+                startAuto();
+            });
+        }
 
         dots.forEach(function (dot) {
             dot.addEventListener('click', function () {
-                showSlide(parseInt(dot.dataset.index));
+                showSlide(parseInt(dot.dataset.index, 10));
                 startAuto();
             });
         });
 
-        // يوقف لما الماوس فوق السلايدر، ويكمل لما يطلع
-        slider.addEventListener('mouseenter', function () { clearInterval(timer); });
+        slider.addEventListener('mouseenter', function () {
+            clearInterval(timer);
+        });
+
         slider.addEventListener('mouseleave', startAuto);
 
-        if (slides.length > 1) startAuto();
+        startAuto();
     }
 
-    /* --- فلترة وترتيب الجولات --- */
+    /* ---------- Tour Filtering and Sorting ---------- */
+
     const toursGrid = document.getElementById('toursGrid');
 
     if (toursGrid) {
-        const cards        = Array.from(toursGrid.querySelectorAll('.tour-card'));
-        const searchInput  = document.getElementById('searchInput');
-        const cityFilter   = document.getElementById('cityFilter');
-        const sortSelect   = document.getElementById('sortSelect');
-        const chips        = document.querySelectorAll('.chip');
+        const cards = Array.from(
+            toursGrid.querySelectorAll('.tour-card')
+        );
+
+        const searchInput = document.getElementById('searchInput');
+        const cityFilter = document.getElementById('cityFilter');
+        const sortSelect = document.getElementById('sortSelect');
+        const chips = document.querySelectorAll('.chip');
         const resultsCount = document.getElementById('resultsCount');
-        const emptyState   = document.getElementById('emptyState');
-        let selectedType   = 'all';
+        const emptyState = document.getElementById('emptyState');
+        const resetFilters = document.getElementById('resetFilters');
+
+        let selectedType = 'all';
 
         function applyFilters() {
-            const search = searchInput.value.trim().toLowerCase();
-            const city   = cityFilter.value;
-            let visible  = 0;
+            const search = searchInput
+                ? searchInput.value.trim().toLowerCase()
+                : '';
+
+            const city = cityFilter ? cityFilter.value : 'all';
+            let visible = 0;
 
             cards.forEach(function (card) {
-                // كل شرط لازم يتحقق عشان البطاقة تظهر
-                const matchSearch = card.dataset.title.toLowerCase().includes(search);
-                const matchCity   = city === 'all' || card.dataset.city === city;
-                const matchType   = selectedType === 'all' || card.dataset.type === selectedType;
+                const title = (card.dataset.title || '').toLowerCase();
+                const cardCity = card.dataset.city || '';
+                const cardType = card.dataset.type || '';
+
+                const matchSearch = title.includes(search);
+                const matchCity = city === 'all' || cardCity === city;
+                const matchType =
+                    selectedType === 'all' || cardType === selectedType;
 
                 const show = matchSearch && matchCity && matchType;
+
                 card.classList.toggle('hide', !show);
-                if (show) visible++;
+
+                if (show) {
+                    visible++;
+                }
             });
 
-            resultsCount.textContent = 'عدد النتائج: ' + visible + ' من ' + cards.length;
-            emptyState.hidden = visible > 0;
+            if (resultsCount) {
+                resultsCount.textContent =
+                    'عدد النتائج: ' + visible + ' من ' + cards.length;
+            }
+
+            if (emptyState) {
+                emptyState.hidden = visible > 0;
+            }
         }
 
         function applySort() {
+            if (!sortSelect) return;
+
             const sortBy = sortSelect.value;
+
             const sorted = cards.slice().sort(function (a, b) {
-                if (sortBy === 'price-asc')  return a.dataset.price - b.dataset.price;
-                if (sortBy === 'price-desc') return b.dataset.price - a.dataset.price;
-                return a.dataset.date.localeCompare(b.dataset.date);   // الأقرب موعداً
+                if (sortBy === 'price-asc') {
+                    return Number(a.dataset.price) - Number(b.dataset.price);
+                }
+
+                if (sortBy === 'price-desc') {
+                    return Number(b.dataset.price) - Number(a.dataset.price);
+                }
+
+                return (a.dataset.date || '').localeCompare(
+                    b.dataset.date || ''
+                );
             });
-            // نرجّع البطاقات للصفحة بالترتيب الجديد
-            sorted.forEach(function (card) { toursGrid.appendChild(card); });
+
+            sorted.forEach(function (card) {
+                toursGrid.appendChild(card);
+            });
         }
 
-        // الأحداث
-        searchInput.addEventListener('input', applyFilters);
-        cityFilter.addEventListener('change', applyFilters);
-        sortSelect.addEventListener('change', applySort);
+        if (searchInput) {
+            searchInput.addEventListener('input', applyFilters);
+        }
+
+        if (cityFilter) {
+            cityFilter.addEventListener('change', applyFilters);
+        }
+
+        if (sortSelect) {
+            sortSelect.addEventListener('change', applySort);
+        }
 
         chips.forEach(function (chip) {
             chip.addEventListener('click', function () {
-                chips.forEach(function (c) { c.classList.remove('active'); });
+                chips.forEach(function (item) {
+                    item.classList.remove('active');
+                });
+
                 chip.classList.add('active');
-                selectedType = chip.dataset.type;
+                selectedType = chip.dataset.type || 'all';
+
                 applyFilters();
             });
         });
 
-        document.getElementById('resetFilters').addEventListener('click', function () {
-            searchInput.value = '';
-            cityFilter.value  = 'all';
-            selectedType      = 'all';
-            chips.forEach(function (c) { c.classList.toggle('active', c.dataset.type === 'all'); });
-            applyFilters();
+        if (resetFilters) {
+            resetFilters.addEventListener('click', function () {
+                if (searchInput) searchInput.value = '';
+                if (cityFilter) cityFilter.value = 'all';
+
+                selectedType = 'all';
+
+                chips.forEach(function (chip) {
+                    chip.classList.toggle(
+                        'active',
+                        chip.dataset.type === 'all'
+                    );
+                });
+
+                applyFilters();
+                applySort();
+            });
+        }
+
+        applyFilters();
+    }
+
+    /* =====================================================
+       Part 2: Tour Booking Form
+       ===================================================== */
+
+    const bookingForm = document.getElementById('bookingForm');
+
+    if (bookingForm) {
+        const price = parseFloat(bookingForm.dataset.price);
+        const maxSeats = parseInt(bookingForm.dataset.seats, 10);
+        const persons = bookingForm.querySelector('#persons');
+        const totalEl = document.getElementById('bookingTotal');
+
+        /* ---------- Update Booking Total ---------- */
+
+        function updateTotal() {
+            if (!persons || !totalEl) return;
+
+            const count = parseInt(persons.value, 10);
+            const total = count > 0 ? count * price : 0;
+
+            totalEl.textContent =
+                total.toLocaleString('en-US') + ' ريال';
+        }
+
+        if (persons) {
+            persons.addEventListener('input', updateTotal);
+            updateTotal();
+        }
+
+        /* ---------- Booking Validation Rules ---------- */
+
+        const rules = {
+            customer_name: value =>
+                value.length < 3
+                    ? 'الرجاء إدخال الاسم (3 أحرف على الأقل)'
+                    : '',
+
+            phone: value =>
+                !/^05\d{8}$/.test(value)
+                    ? 'رقم الجوال لازم يبدأ بـ 05 ويتكون من 10 أرقام'
+                    : '',
+
+            email: value =>
+                !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+                    ? 'الرجاء إدخال بريد إلكتروني صحيح'
+                    : '',
+
+            persons: value => {
+                const count = Number(value);
+
+                if (!Number.isInteger(count) || count < 1) {
+                    return 'عدد الأشخاص لازم يكون 1 على الأقل';
+                }
+
+                if (count > maxSeats) {
+                    return 'المقاعد المتبقية ' + maxSeats + ' فقط';
+                }
+
+                return '';
+            }
+        };
+
+        function validateField(input) {
+            const rule = rules[input.name];
+
+            if (!rule) return true;
+
+            const message = rule(input.value.trim());
+            const group = input.closest('.form-group');
+
+            if (!group) return message === '';
+
+            group.classList.toggle('invalid', message !== '');
+
+            const errorMessage = group.querySelector('.error-msg');
+
+            if (errorMessage) {
+                errorMessage.textContent = message;
+            }
+
+            return message === '';
+        }
+
+        /* ---------- Validate Fields on Input ---------- */
+
+        Object.keys(rules).forEach(function (name) {
+            const input = bookingForm.elements[name];
+
+            if (!input) return;
+
+            input.addEventListener('blur', function () {
+                validateField(input);
+            });
+
+            input.addEventListener('input', function () {
+                const group = input.closest('.form-group');
+
+                if (group && group.classList.contains('invalid')) {
+                    validateField(input);
+                }
+            });
         });
 
-        applyFilters();   // أول ما تفتح الصفحة (عشان لو جاية من الرئيسية بمدينة محددة)
+        /* ---------- Validate Before Submission ---------- */
+
+        bookingForm.addEventListener('submit', function (event) {
+            let firstInvalid = null;
+
+            Object.keys(rules).forEach(function (name) {
+                const input = bookingForm.elements[name];
+
+                if (!input) return;
+
+                if (!validateField(input) && !firstInvalid) {
+                    firstInvalid = input;
+                }
+            });
+
+            if (firstInvalid) {
+                event.preventDefault();
+                firstInvalid.focus();
+            }
+        });
     }
-    
 
-});
-/* =====================================================
-   الجزء 2: نموذج الحجز (tour.php)
-   ===================================================== */
-(function () {
-  const form = document.getElementById('bookingForm');
-  if (!form) return; // الصفحة ما فيها نموذج حجز
+    /* =====================================================
+       Part 3: Image Preview for Add/Edit Tour Forms
+       ===================================================== */
 
-  const price    = parseFloat(form.dataset.price);
-  const maxSeats = parseInt(form.dataset.seats, 10);
-  const persons  = form.querySelector('#persons');
-  const totalEl  = document.getElementById('bookingTotal');
+    const imageInput = document.getElementById('image');
+    const previewContainer = document.getElementById('imagePreviewContainer');
+    const previewImage = document.getElementById('imagePreview');
 
-  // تحديث السعر الإجمالي مباشرة لما يتغير العدد
-  function updateTotal() {
-    const n = parseInt(persons.value, 10);
-    const total = n > 0 ? n * price : 0;
-    totalEl.textContent = total.toLocaleString('en-US') + ' ريال';
-  }
-  persons.addEventListener('input', updateTotal);
+    if (imageInput && previewContainer && previewImage) {
+        imageInput.addEventListener('change', function () {
+            const file = imageInput.files && imageInput.files[0];
 
-  // شروط كل حقل: ترجع رسالة الخطأ، أو نص فاضي إذا سليم
-  const rules = {
-    customer_name: v => v.length < 3 ? 'الرجاء إدخال الاسم (3 أحرف على الأقل)' : '',
-    phone: v => !/^05\d{8}$/.test(v) ? 'رقم الجوال لازم يبدأ بـ 05 ويتكون من 10 أرقام' : '',
-    email: v => !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? 'الرجاء إدخال بريد إلكتروني صحيح' : '',
-    persons: v => {
-      const n = Number(v);
-      if (!Number.isInteger(n) || n < 1) return 'عدد الأشخاص لازم يكون 1 على الأقل';
-      if (n > maxSeats) return 'المقاعد المتبقية ' + maxSeats + ' فقط';
-      return '';
+            if (!file) {
+                previewContainer.hidden = true;
+                previewImage.removeAttribute('src');
+                return;
+            }
+
+            /* ---------- Validate Image Type ---------- */
+
+            const allowedTypes = [
+                'image/jpeg',
+                'image/png',
+                'image/webp'
+            ];
+
+            if (!allowedTypes.includes(file.type)) {
+                alert('نوع الصورة غير مسموح. استخدمي JPG أو PNG أو WEBP.');
+
+                imageInput.value = '';
+                previewContainer.hidden = true;
+                previewImage.removeAttribute('src');
+
+                return;
+            }
+
+            /* ---------- Validate Image Size ---------- */
+
+            if (file.size > 5 * 1024 * 1024) {
+                alert('حجم الصورة يجب ألا يتجاوز 5MB.');
+
+                imageInput.value = '';
+                previewContainer.hidden = true;
+                previewImage.removeAttribute('src');
+
+                return;
+            }
+
+            /* ---------- Display Image Preview ---------- */
+
+            const reader = new FileReader();
+
+            reader.onload = function (event) {
+                previewImage.src = event.target.result;
+                previewContainer.hidden = false;
+            };
+
+            reader.onerror = function () {
+                alert('تعذر عرض معاينة الصورة.');
+
+                imageInput.value = '';
+                previewContainer.hidden = true;
+                previewImage.removeAttribute('src');
+            };
+
+            reader.readAsDataURL(file);
+        });
     }
-  };
 
-  function validateField(input) {
-    const msg   = rules[input.name](input.value.trim());
-    const group = input.closest('.form-group');
-    group.classList.toggle('invalid', msg !== '');
-    group.querySelector('.error-msg').textContent = msg;
-    return msg === '';
-  }
+    /* =====================================================
+       Part 4: Delete Confirmation
+       Supports Tour and Booking Delete Forms
+       ===================================================== */
 
-  // تحقق لما تطلع من الحقل، وتحديث مباشر إذا كان فيه خطأ
-  Object.keys(rules).forEach(name => {
-    const input = form.elements[name];
-    input.addEventListener('blur', () => validateField(input));
-    input.addEventListener('input', () => {
-      if (input.closest('.form-group').classList.contains('invalid')) validateField(input);
+    document.querySelectorAll('form[data-confirm]').forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            const message = form.dataset.confirm;
+
+            if (message && !window.confirm(message)) {
+                event.preventDefault();
+            }
+        });
     });
-  });
 
-  // عند الإرسال: نتحقق من الكل، وإذا فيه غلط نوقف الإرسال
-  form.addEventListener('submit', e => {
-    let firstInvalid = null;
-    Object.keys(rules).forEach(name => {
-      const input = form.elements[name];
-      if (!validateField(input) && !firstInvalid) firstInvalid = input;
-    });
-    if (firstInvalid) {
-      e.preventDefault();
-      firstInvalid.focus();
-    }
-  });
-})();
-
-/* الجزء 2: تأكيد قبل الحذف أو الإلغاء (admin/bookings.php) */
-document.querySelectorAll('.bookings-table form[data-confirm]').forEach(form => {
-  form.addEventListener('submit', e => {
-    if (!confirm(form.dataset.confirm)) e.preventDefault();
-  });
 });
