@@ -18,8 +18,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-
-    /* ===== الجزء 1: الرئيسية + الجولات + الدخول ===== */
+/* ===== الجزء 1: الرئيسية + الجولات + الدخول ===== */
 
     /* --- الوضع الليلي (يتذكر اختيارك حتى لو قفلتي الصفحة) --- */
     const themeToggle = document.getElementById('themeToggle');
@@ -80,8 +79,47 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    /* (لاحقاً هنا: سلايدر الرئيسية + فلترة الجولات) */
+    /* --- سلايدر الرئيسية --- */
+    const slider = document.getElementById('heroSlider');
 
+    if (slider) {
+        const slides = slider.querySelectorAll('.slide');
+        const dots   = slider.querySelectorAll('.dot');
+        let current  = 0;
+        let timer;
+
+        function showSlide(index) {
+            // نلف: بعد آخر شريحة نرجع للأولى، وقبل الأولى نروح للأخيرة
+            current = (index + slides.length) % slides.length;
+            slides.forEach(function (s, i) { s.classList.toggle('active', i === current); });
+            dots.forEach(function (d, i)   { d.classList.toggle('active', i === current); });
+        }
+
+        function startAuto() {
+            clearInterval(timer);
+            timer = setInterval(function () { showSlide(current + 1); }, 5000);  // كل 5 ثواني
+        }
+
+        const nextBtn = document.getElementById('sliderNext');
+        const prevBtn = document.getElementById('sliderPrev');
+        if (nextBtn) nextBtn.addEventListener('click', function () { showSlide(current + 1); startAuto(); });
+        if (prevBtn) prevBtn.addEventListener('click', function () { showSlide(current - 1); startAuto(); });
+
+        dots.forEach(function (dot) {
+            dot.addEventListener('click', function () {
+                showSlide(parseInt(dot.dataset.index));
+                startAuto();
+            });
+        });
+
+        // يوقف لما الماوس فوق السلايدر، ويكمل لما يطلع
+        slider.addEventListener('mouseenter', function () { clearInterval(timer); });
+        slider.addEventListener('mouseleave', startAuto);
+
+        if (slides.length > 1) startAuto();
+    }
+
+    /* (لاحقاً هنا: فلترة الجولات) */
 
     /* ===== الجزء 2: تفاصيل الجولة + الحجز =====
        المطلوب هنا:
