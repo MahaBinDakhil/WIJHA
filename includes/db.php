@@ -11,6 +11,11 @@ if (!file_exists(__DIR__ . '/config.php')) {
 }
 require_once __DIR__ . '/config.php';
 
+// الجلسة: تبدأ هنا مرة وحدة لكل الصفحات (نحتاجها للدخول ورسائل النجاح)
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
 try {
@@ -45,4 +50,30 @@ function arabic_date($date) {
                'يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
     $t = strtotime($date);
     return date('j', $t) . ' ' . $months[(int)date('n', $t)] . ' ' . date('Y', $t);
+}
+
+/* ---------- رسائل النجاح والخطأ (Flash) ----------
+   تُحفظ في الجلسة وتظهر مرة وحدة في الصفحة اللي بعدها.
+   الاستخدام بعد أي عملية:
+       set_flash('success', 'تمت إضافة الجولة بنجاح');
+       header('Location: dashboard.php'); exit;
+   وفي الصفحة اللي تعرضها:
+       <?php show_flash(); ?>
+*/
+function set_flash($type, $message) {
+    $_SESSION['flash'] = ['type' => $type, 'message' => $message];
+}
+
+function show_flash() {
+    if (!empty($_SESSION['flash'])) {
+        $f = $_SESSION['flash'];
+        $class = $f['type'] === 'success' ? 'alert-success' : 'alert-error';
+        echo '<div class="alert ' . $class . '">' . e($f['message']) . '</div>';
+        unset($_SESSION['flash']);
+    }
+}
+
+// هل فيه مشرفة مسجلة دخول؟
+function is_admin() {
+    return !empty($_SESSION['admin_id']);
 }
