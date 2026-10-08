@@ -253,6 +253,99 @@ textarea.form-control { min-height: 110px; resize: vertical; }
 
 /* ===== الجزء 1: الرئيسية + الجولات + الدخول ===== */
 
+/* --- الرئيسية: السلايدر --- */
+.hero-slider {
+    position: relative; height: clamp(420px, 70vh, 640px);
+    overflow: hidden; background: var(--primary-dark);
+}
+.slide {
+    position: absolute; inset: 0;
+    opacity: 0; transition: opacity .8s ease;
+    pointer-events: none;
+}
+.slide.active { opacity: 1; pointer-events: auto; }
+.slide img { width: 100%; height: 100%; object-fit: cover; transform: scale(1.06); transition: transform 6s ease; }
+.slide.active img { transform: scale(1); }
+.slide::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(to left, rgba(30,40,20,.78) 0%, rgba(30,40,20,.35) 55%, rgba(30,40,20,.1) 100%);
+}
+.slide-content {
+    position: absolute; inset: 0; z-index: 2;
+    display: flex; flex-direction: column; justify-content: center; align-items: flex-start;
+    gap: 14px; color: #fff;
+}
+.slide-content h1 { max-width: 620px; text-shadow: 0 2px 12px rgba(0,0,0,.3); }
+.slide-content p  { max-width: 480px; font-size: 1.15rem; opacity: .92; }
+.slider-btn {
+    position: absolute; top: 50%; transform: translateY(-50%); z-index: 3;
+    width: 46px; height: 46px; border-radius: 50%; border: none;
+    background: rgba(255,255,255,.18); color: #fff; font-size: 1.2rem;
+    cursor: pointer; backdrop-filter: blur(4px); transition: background .2s;
+}
+.slider-btn:hover { background: rgba(255,255,255,.35); }
+.slider-btn.prev { right: 20px; }
+.slider-btn.next { left: 20px; }
+.slider-dots {
+    position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 8px; z-index: 3;
+}
+.dot {
+    width: 10px; height: 10px; border-radius: 999px; border: none;
+    background: rgba(255,255,255,.5); cursor: pointer; transition: all .3s;
+}
+.dot.active { width: 28px; background: var(--sand); }
+
+/* --- الرئيسية: النبذة --- */
+.eyebrow { color: var(--primary); font-weight: 700; display: block; margin-bottom: 6px; }
+body.dark .eyebrow { color: #a9c98c; }
+.about-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 48px; align-items: center; }
+.about-grid h2 { margin-bottom: 14px; }
+.features { display: flex; flex-direction: column; gap: 14px; }
+.feature {
+    display: flex; gap: 16px; align-items: center;
+    background: var(--surface); padding: 18px 20px;
+    border-radius: var(--radius); box-shadow: var(--shadow);
+}
+.feature > span {
+    font-size: 1.6rem; width: 54px; height: 54px; flex-shrink: 0;
+    display: grid; place-items: center; border-radius: 50%; background: var(--sky);
+}
+.feature p { font-size: .92rem; }
+
+/* --- الرئيسية: المدن --- */
+.section-sand { background: var(--sand); }
+.cities-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.city-card {
+    position: relative; aspect-ratio: 4 / 3; border-radius: var(--radius);
+    overflow: hidden; box-shadow: var(--shadow); display: block;
+}
+.city-card img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s; }
+.city-card:hover img { transform: scale(1.08); }
+.city-card::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(30,40,20,.85), transparent 60%);
+}
+.city-info { position: absolute; bottom: 18px; right: 20px; z-index: 1; color: #fff; }
+.city-info h3 { font-size: 1.5rem; }
+.city-info span { opacity: .9; }
+
+.section-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 8px; }
+
+@media (max-width: 900px) {
+    .about-grid { grid-template-columns: 1fr; gap: 28px; }
+    .cities-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 520px) {
+    .cities-grid { gap: 12px; }
+    .city-card { aspect-ratio: 1 / 1; }
+    .city-info { bottom: 12px; right: 14px; }
+    .city-info h3 { font-size: 1.15rem; }
+    .city-info span { font-size: .85rem; }
+    .slider-btn { display: none; }
+    .slide-content p { font-size: 1rem; }
+}
+
 /* --- صفحة الدخول --- */
 .login-wrap {
     display: grid; grid-template-columns: 1fr 1fr;
