@@ -509,6 +509,34 @@ body.dark .stat-card strong { color: #a9c98c; }
 .tour-sidebar .btn[disabled] { opacity: .5; cursor: not-allowed; }
 .tour-note { text-align: center; font-size: .85rem; margin: .9rem 0 0; }
 
+/* نموذج الحجز */
+.booking-box { padding: 2rem; margin-top: 1.5rem; scroll-margin-top: 100px; }
+.booking-box h2 { margin: 0 0 .3rem; }
+.booking-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 1.25rem; margin-top: 1.5rem; }
+.booking-form .error-msg { display: none; color: #c0392b; font-size: .85rem; margin-top: .35rem; }
+.booking-form .form-group.invalid .error-msg { display: block; }
+.booking-form .form-group.invalid .form-control { border-color: #c0392b; }
+.booking-total {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 1rem 1.25rem; margin: .5rem 0 1.25rem;
+  border-radius: 12px; border: 1px dashed rgba(127,127,127,.4);
+}
+.booking-total strong { font-size: 1.4rem; }
+@media (max-width: 600px) { .booking-grid { grid-template-columns: 1fr; } }
+
+/* إدارة الحجوزات */
+.bookings-filter { margin-bottom: 1.25rem; }
+.bookings-filter .chip { text-decoration: none; }
+.booking-contact { font-size: .82rem; margin-top: .25rem; }
+.bookings-table .actions { display: flex; flex-wrap: wrap; gap: .4rem; }
+.bookings-table .actions form { margin: 0; }
+.status-badge {
+  display: inline-block; padding: .25rem .8rem; border-radius: 999px;
+  font-size: .82rem; font-weight: 700; white-space: nowrap;
+}
+.status-new       { background: #fff4d6; color: #8a6100; }
+.status-confirmed { background: #dcf3e3; color: #1e6b3a; }
+.status-cancelled { background: #f9dede; color: #a12626; }
 /* الجوال */
 @media (max-width: 900px) {
   .tour-facts-grid { grid-template-columns: repeat(2, 1fr); }
@@ -519,3 +547,4 @@ body.dark .stat-card strong { color: #a9c98c; }
   .tour-hero { height: 300px; }
   .tour-hero-content { padding: 1.25rem; }
 }
+

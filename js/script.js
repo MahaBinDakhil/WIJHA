@@ -190,3 +190,73 @@ document.addEventListener('DOMContentLoaded', function () {
     
 
 });
+/* =====================================================
+   الجزء 2: نموذج الحجز (tour.php)
+   ===================================================== */
+(function () {
+  const form = document.getElementById('bookingForm');
+  if (!form) return; // الصفحة ما فيها نموذج حجز
+
+  const price    = parseFloat(form.dataset.price);
+  const maxSeats = parseInt(form.dataset.seats, 10);
+  const persons  = form.querySelector('#persons');
+  const totalEl  = document.getElementById('bookingTotal');
+
+  // تحديث السعر الإجمالي مباشرة لما يتغير العدد
+  function updateTotal() {
+    const n = parseInt(persons.value, 10);
+    const total = n > 0 ? n * price : 0;
+    totalEl.textContent = total.toLocaleString('en-US') + ' ريال';
+  }
+  persons.addEventListener('input', updateTotal);
+
+  // شروط كل حقل: ترجع رسالة الخطأ، أو نص فاضي إذا سليم
+  const rules = {
+    customer_name: v => v.length < 3 ? 'الرجاء إدخال الاسم (3 أحرف على الأقل)' : '',
+    phone: v => !/^05\d{8}$/.test(v) ? 'رقم الجوال لازم يبدأ بـ 05 ويتكون من 10 أرقام' : '',
+    email: v => !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? 'الرجاء إدخال بريد إلكتروني صحيح' : '',
+    persons: v => {
+      const n = Number(v);
+      if (!Number.isInteger(n) || n < 1) return 'عدد الأشخاص لازم يكون 1 على الأقل';
+      if (n > maxSeats) return 'المقاعد المتبقية ' + maxSeats + ' فقط';
+      return '';
+    }
+  };
+
+  function validateField(input) {
+    const msg   = rules[input.name](input.value.trim());
+    const group = input.closest('.form-group');
+    group.classList.toggle('invalid', msg !== '');
+    group.querySelector('.error-msg').textContent = msg;
+    return msg === '';
+  }
+
+  // تحقق لما تطلع من الحقل، وتحديث مباشر إذا كان فيه خطأ
+  Object.keys(rules).forEach(name => {
+    const input = form.elements[name];
+    input.addEventListener('blur', () => validateField(input));
+    input.addEventListener('input', () => {
+      if (input.closest('.form-group').classList.contains('invalid')) validateField(input);
+    });
+  });
+
+  // عند الإرسال: نتحقق من الكل، وإذا فيه غلط نوقف الإرسال
+  form.addEventListener('submit', e => {
+    let firstInvalid = null;
+    Object.keys(rules).forEach(name => {
+      const input = form.elements[name];
+      if (!validateField(input) && !firstInvalid) firstInvalid = input;
+    });
+    if (firstInvalid) {
+      e.preventDefault();
+      firstInvalid.focus();
+    }
+  });
+})();
+
+/* الجزء 2: تأكيد قبل الحذف أو الإلغاء (admin/bookings.php) */
+document.querySelectorAll('.bookings-table form[data-confirm]').forEach(form => {
+  form.addEventListener('submit', e => {
+    if (!confirm(form.dataset.confirm)) e.preventDefault();
+  });
+});

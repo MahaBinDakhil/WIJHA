@@ -1,8 +1,13 @@
 <?php
+/* =====================================================
+   tour.php — تفاصيل الجولة + نموذج الحجز (الجزء 2)
+   ===================================================== */
 require_once 'includes/db.php';
 
+// رقم الجولة من الرابط: tour.php?id=7
 $id = (int)($_GET['id'] ?? 0);
 
+// نجيب الجولة مع اسم مدينتها (Prepared Statement)
 $stmt = $conn->prepare("
     SELECT t.*, c.name AS city_name
     FROM tours t
@@ -14,7 +19,9 @@ $stmt->execute();
 $tour = $stmt->get_result()->fetch_assoc();
 
 if ($tour) {
+    // نقسم البرنامج على "-" عشان نعرضه خطوات مرقمة
     $steps    = array_filter(array_map('trim', preg_split('/\s*-\s*/u', $tour['itinerary'] ?? '')));
+    // نقسم "يشمل" على الفاصلة العربية
     $includes = array_filter(array_map('trim', explode('،', $tour['includes'] ?? '')));
     $seats    = (int)$tour['available_seats'];
 }
@@ -26,6 +33,8 @@ require_once 'includes/header.php';
 
 <section class="section">
   <div class="container">
+
+  <?php show_flash(); ?>
 
   <?php if (!$tour): ?>
 
@@ -101,7 +110,7 @@ require_once 'includes/header.php';
         <p>📍 <?= e($tour['meeting_point']) ?></p>
       </article>
 
-      <!-- بطاقة الحجز -->
+      <!-- بطاقة السعر -->
       <aside class="card tour-sidebar">
         <small class="muted">السعر للشخص</small>
         <span class="price"><?= price($tour['price']) ?></span>
@@ -126,6 +135,54 @@ require_once 'includes/header.php';
       </aside>
 
     </div>
+
+    <!-- نموذج الحجز -->
+    <?php if ($seats > 0): ?>
+    <div class="card booking-box" id="booking">
+      <h2>احجز مقعدك</h2>
+      <p class="muted">عبّي بياناتك وبنتواصل معك لتأكيد الحجز</p>
+
+      <form action="book.php" method="POST" id="bookingForm" class="booking-form" novalidate
+            data-price="<?= (float)$tour['price'] ?>" data-seats="<?= $seats ?>">
+
+        <input type="hidden" name="tour_id" value="<?= (int)$tour['id'] ?>">
+
+        <div class="booking-grid">
+          <div class="form-group">
+            <label for="customer_name">الاسم الكامل <span class="req">*</span></label>
+            <input type="text" id="customer_name" name="customer_name" class="form-control" placeholder="مثال: سارة محمد">
+            <span class="error-msg"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="phone">رقم الجوال <span class="req">*</span></label>
+            <input type="tel" id="phone" name="phone" class="form-control" placeholder="05xxxxxxxx"
+                   maxlength="10" inputmode="numeric" dir="ltr">
+            <span class="error-msg"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="email">البريد الإلكتروني <span class="req">*</span></label>
+            <input type="email" id="email" name="email" class="form-control" placeholder="name@example.com" dir="ltr">
+            <span class="error-msg"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="persons">عدد الأشخاص <span class="req">*</span></label>
+            <input type="number" id="persons" name="persons" class="form-control" value="1" min="1" max="<?= $seats ?>">
+            <span class="error-msg"></span>
+          </div>
+        </div>
+
+        <div class="booking-total">
+          <span>الإجمالي</span>
+          <strong id="bookingTotal"><?= price($tour['price']) ?></strong>
+        </div>
+
+        <button type="submit" class="btn btn-block">تأكيد الحجز</button>
+      </form>
+    </div>
+    <?php endif; ?>
 
   <?php endif; ?>
 
