@@ -19,14 +19,68 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
 
-    /* ===== الجزء 1: الرئيسية + الجولات + الدخول =====
-       المطلوب هنا:
-       - الوضع الليلي: زر #themeToggle يضيف/يشيل class "dark" على body
-         (التنسيق جاهز في style.css تحت body.dark)
-       - سلايدر صور الرئيسية
-       - فلترة الجولات حسب المدينة والنوع
-       - التحقق من نموذج الدخول
-    */
+    /* ===== الجزء 1: الرئيسية + الجولات + الدخول ===== */
+
+    /* --- الوضع الليلي (يتذكر اختيارك حتى لو قفلتي الصفحة) --- */
+    const themeToggle = document.getElementById('themeToggle');
+
+    function applyTheme(isDark) {
+        document.body.classList.toggle('dark', isDark);
+        if (themeToggle) themeToggle.textContent = isDark ? '☀️' : '🌙';
+    }
+
+    let savedTheme = null;
+    try { savedTheme = localStorage.getItem('wijha-theme'); } catch (e) {}
+    applyTheme(savedTheme === 'dark');
+
+    if (themeToggle) {
+        themeToggle.addEventListener('click', function () {
+            const isDark = !document.body.classList.contains('dark');
+            applyTheme(isDark);
+            try { localStorage.setItem('wijha-theme', isDark ? 'dark' : 'light'); } catch (e) {}
+        });
+    }
+
+    /* --- نموذج الدخول: التحقق قبل الإرسال --- */
+    const loginForm = document.getElementById('loginForm');
+
+    if (loginForm) {
+        const fields = [
+            document.getElementById('username'),
+            document.getElementById('password')
+        ];
+
+        loginForm.addEventListener('submit', function (event) {
+            let valid = true;
+            fields.forEach(function (input) {
+                if (input.value.trim() === '') {
+                    input.classList.add('invalid');   // يظهر رسالة الخطأ تحته
+                    valid = false;
+                } else {
+                    input.classList.remove('invalid');
+                }
+            });
+            if (!valid) event.preventDefault();       // يوقف الإرسال
+        });
+
+        // تختفي رسالة الخطأ أول ما تبدأ تكتب
+        fields.forEach(function (input) {
+            input.addEventListener('input', function () {
+                if (input.value.trim() !== '') input.classList.remove('invalid');
+            });
+        });
+
+        // زر إظهار/إخفاء كلمة المرور
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordInput  = document.getElementById('password');
+        togglePassword.addEventListener('click', function () {
+            const show = passwordInput.type === 'password';
+            passwordInput.type = show ? 'text' : 'password';
+            togglePassword.textContent = show ? '🙈' : '👁';
+        });
+    }
+
+    /* (لاحقاً هنا: سلايدر الرئيسية + فلترة الجولات) */
 
 
     /* ===== الجزء 2: تفاصيل الجولة + الحجز =====
