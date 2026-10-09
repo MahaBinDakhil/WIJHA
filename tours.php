@@ -7,13 +7,14 @@
 require_once 'includes/db.php';
 
 // كل الجولات مع اسم المدينة
+// الجولات المنتهية تنزل آخر القائمة، والباقي حسب الأقرب موعداً
 $tours = $conn->query("
     SELECT t.id, t.title, t.type, t.short_desc, t.image, t.tour_date,
            t.duration, t.price, t.available_seats, t.city_id,
            c.name AS city_name
     FROM tours t
     JOIN cities c ON c.id = t.city_id
-    ORDER BY t.tour_date
+    ORDER BY (t.tour_date < CURDATE()), t.tour_date
 ")->fetch_all(MYSQLI_ASSOC);
 
 // المدن لقائمة الفلترة
@@ -24,6 +25,9 @@ $types = ['تاريخية', 'طبيعة', 'مغامرات', 'ثقافية'];
 
 // إذا جاية من الرئيسية بالضغط على مدينة: tours.php?city=3
 $selectedCity = isset($_GET['city']) ? (int)$_GET['city'] : 0;
+
+// تاريخ اليوم بتوقيت السعودية — عشان نعرف الجولات المنتهية
+$today = (new DateTime('today', new DateTimeZone('Asia/Riyadh')))->format('Y-m-d');
 
 $pageTitle  = 'الجولات';
 $activePage = 'tours';
@@ -74,8 +78,9 @@ require_once 'includes/header.php';
         <!-- ========== البطاقات ========== -->
         <div class="cards-grid" id="toursGrid">
             <?php foreach ($tours as $tour): ?>
+                <?php $isExpired = $tour['tour_date'] < $today; ?>
                 <!-- data-* تحفظ بيانات الجولة عشان الـ JS يفلتر ويرتب عليها -->
-                <article class="card tour-card"
+                <article class="card tour-card <?= $isExpired ? 'is-expired' : '' ?>"
                          data-city="<?= (int)$tour['city_id'] ?>"
                          data-type="<?= e($tour['type']) ?>"
                          data-title="<?= e($tour['title']) ?>"
@@ -84,7 +89,9 @@ require_once 'includes/header.php';
                     <div class="card-img">
                         <img src="images/<?= e($tour['image']) ?>" alt="<?= e($tour['title']) ?>" loading="lazy">
                         <span class="badge"><?= e($tour['type']) ?></span>
-                        <?php if ((int)$tour['available_seats'] === 0): ?>
+                        <?php if ($isExpired): ?>
+                            <span class="badge badge-full">منتهية</span>
+                        <?php elseif ((int)$tour['available_seats'] === 0): ?>
                             <span class="badge badge-full">مكتملة</span>
                         <?php elseif ((int)$tour['available_seats'] <= 5): ?>
                             <span class="badge badge-few">باقي <?= (int)$tour['available_seats'] ?> مقاعد</span>

@@ -537,6 +537,9 @@ body.dark .stat-card strong { color: #a9c98c; }
 .status-new       { background: #fff4d6; color: #8a6100; }
 .status-confirmed { background: #dcf3e3; color: #1e6b3a; }
 .status-cancelled { background: #f9dede; color: #a12626; }
+
+/* شعار الجولة المنتهية */
+.tour-expired-badge { background: #c0392b; color: #fff; margin-right: .4rem; }
 /* الجوال */
 @media (max-width: 900px) {
   .tour-facts-grid { grid-template-columns: repeat(2, 1fr); }
@@ -548,3 +551,6 @@ body.dark .stat-card strong { color: #a9c98c; }
   .tour-hero-content { padding: 1.25rem; }
 }
 
+/* بطاقة الجولة المنتهية في tours.php */
+.tour-card.is-expired { opacity: .65; }
+.tour-card.is-expired img { filter: grayscale(.7); }

@@ -337,10 +337,15 @@ document.addEventListener('DOMContentLoaded', function () {
         /* ---------- Booking Validation Rules ---------- */
 
         const rules = {
-            customer_name: value =>
-                value.length < 3
-                    ? 'الرجاء إدخال الاسم (3 أحرف على الأقل)'
-                    : '',
+            customer_name: v => {
+            if (v.length < 3) return 'الرجاء إدخال الاسم (3 أحرف على الأقل)';
+            const arabic  = /^[\u0621-\u064A\s]+$/;   // حروف عربية ومسافات
+            const english = /^[A-Za-z\s]+$/;          // حروف إنجليزية ومسافات
+            if (!arabic.test(v) && !english.test(v)) {
+            return 'الاسم لازم يكون بالعربي كامل أو بالإنجليزي كامل، بدون أرقام أو رموز';
+            }
+            return '';
+        },
 
             phone: value =>
                 !/^05\d{8}$/.test(value)
@@ -424,9 +429,15 @@ document.addEventListener('DOMContentLoaded', function () {
             });
 
             if (firstInvalid) {
-                event.preventDefault();
+                e.preventDefault();
                 firstInvalid.focus();
+                return;
             }
+
+            // كل شي سليم: نعطل الزر عشان ما ينرسل الحجز مرتين
+            const btn = form.querySelector('button[type="submit"]');
+            btn.disabled = true;
+            btn.textContent = 'جاري الحجز...';
         });
     }
 

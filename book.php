@@ -25,6 +25,8 @@ $back = 'tour.php?id=' . $tourId;   // نرجع لنفس الجولة
 $error = '';
 if (mb_strlen($name) < 3 || mb_strlen($name) > 100) {
     $error = 'الرجاء إدخال الاسم بشكل صحيح';
+} elseif (!preg_match('/^([\x{0621}-\x{064A}\s]+|[A-Za-z\s]+)$/u', $name)) {
+    $error = 'الاسم لازم يكون بالعربي كامل أو بالإنجليزي كامل، بدون أرقام أو رموز';
 } elseif (!preg_match('/^05\d{8}$/', $phone)) {
     $error = 'رقم الجوال لازم يبدأ بـ 05 ويتكون من 10 أرقام';
 } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($email) > 100) {
@@ -45,7 +47,7 @@ try {
     $conn->begin_transaction();
 
     // نجيب الجولة ونقفل صفها (FOR UPDATE) عشان ما ينحجز نفس المقعد مرتين بنفس اللحظة
-    $stmt = $conn->prepare('SELECT title, price, available_seats FROM tours WHERE id = ? FOR UPDATE');
+    $stmt = $conn->prepare('SELECT title, price, available_seats, tour_date FROM tours WHERE id = ? FOR UPDATE');
     $stmt->bind_param('i', $tourId);
     $stmt->execute();
     $tour = $stmt->get_result()->fetch_assoc();
@@ -55,6 +57,15 @@ try {
         $conn->rollback();
         set_flash('error', 'الجولة غير موجودة');
         header('Location: tours.php');
+        exit;
+    }
+
+    // الجولة انتهى موعدها؟
+    $today = (new DateTime('today', new DateTimeZone('Asia/Riyadh')))->format('Y-m-d');
+    if ($tour['tour_date'] < $today) {
+        $conn->rollback();
+        set_flash('error', 'عذراً، انتهى موعد هذه الجولة ولا يمكن الحجز فيها');
+        header('Location: ' . $back);
         exit;
     }
 

@@ -24,6 +24,13 @@ if ($tour) {
     // نقسم "يشمل" على الفاصلة العربية
     $includes = array_filter(array_map('trim', explode('،', $tour['includes'] ?? '')));
     $seats    = (int)$tour['available_seats'];
+
+    // هل تاريخ الجولة راح؟ (نقارن بتاريخ اليوم بتوقيت السعودية)
+    $today   = (new DateTime('today', new DateTimeZone('Asia/Riyadh')))->format('Y-m-d');
+    $expired = $tour['tour_date'] < $today;
+
+    // الحجز متاح بس إذا فيه مقاعد والجولة ما انتهت
+    $canBook = $seats > 0 && !$expired;
 }
 
 $pageTitle  = $tour ? $tour['title'] : 'الجولة غير موجودة';
@@ -56,6 +63,9 @@ require_once 'includes/header.php';
       <img src="images/<?= e($tour['image']) ?>" alt="<?= e($tour['title']) ?>">
       <div class="tour-hero-content">
         <span class="tour-type"><?= e($tour['type']) ?></span>
+        <?php if ($expired): ?>
+          <span class="tour-type tour-expired-badge">منتهية</span>
+        <?php endif; ?>
         <h1><?= e($tour['title']) ?></h1>
         <p class="tour-hero-sub"><?= e($tour['short_desc']) ?></p>
       </div>
@@ -115,8 +125,10 @@ require_once 'includes/header.php';
         <small class="muted">السعر للشخص</small>
         <span class="price"><?= price($tour['price']) ?></span>
 
-        <p class="tour-seats <?= $seats <= 5 ? 'few' : '' ?>">
-          <?php if ($seats === 0): ?>
+        <p class="tour-seats <?= ($expired || $seats <= 5) ? 'few' : '' ?>">
+          <?php if ($expired): ?>
+            انتهى موعد هذه الجولة
+          <?php elseif ($seats === 0): ?>
             الجولة مكتملة
           <?php elseif ($seats <= 5): ?>
             باقي <?= $seats ?> مقاعد فقط!
@@ -125,8 +137,10 @@ require_once 'includes/header.php';
           <?php endif; ?>
         </p>
 
-        <?php if ($seats > 0): ?>
+        <?php if ($canBook): ?>
           <a href="#booking" class="btn btn-block">احجز الآن</a>
+        <?php elseif ($expired): ?>
+          <a href="tours.php" class="btn btn-block btn-outline">تصفح الجولات القادمة</a>
         <?php else: ?>
           <button class="btn btn-block" disabled>الجولة مكتملة</button>
         <?php endif; ?>
@@ -137,7 +151,7 @@ require_once 'includes/header.php';
     </div>
 
     <!-- نموذج الحجز -->
-    <?php if ($seats > 0): ?>
+    <?php if ($canBook): ?>
     <div class="card booking-box" id="booking">
       <h2>احجز مقعدك</h2>
       <p class="muted">عبّي بياناتك وبنتواصل معك لتأكيد الحجز</p>
