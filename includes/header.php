@@ -1,15 +1,4 @@
 <?php
-/* =====================================================
-   header.php — الجزء العلوي المشترك لكل الصفحات
-   طريقة الاستخدام في أول أي صفحة:
-
-   <?php
-     $pageTitle = 'الجولات';   // عنوان التبويب
-     $activePage = 'tours';    // home | tours | login  (يلوّن الرابط الحالي)
-     $base = '';               // صفحات مجلد admin تكتب: $base = '../';
-     require_once 'includes/header.php';
-   ?>
-   ===================================================== */
 $pageTitle  = $pageTitle  ?? 'وِجهة';
 $activePage = $activePage ?? '';
 $base       = $base       ?? '';
@@ -43,12 +32,13 @@ $base       = $base       ?? '';
                     <li><a href="<?= $base ?>admin/dashboard.php" class="<?= $activePage === 'dashboard' ? 'active' : '' ?>">لوحة التحكم</a></li>
                     <li><a href="<?= $base ?>admin/logout.php">تسجيل الخروج</a></li>
                 <?php else: ?>
-                    <li><a href="<?= $base ?>admin/login.php" class="<?= $activePage === 'login' ? 'active' : '' ?>">دخول المشرفات</a></li>
+                    <li><a href="<?= $base ?>admin/login.php" class="<?= $activePage === 'login' ? 'active' : '' ?>">دخول الإدارة</a></li>
                 <?php endif; ?>
-            </ul>
-            <button class="theme-toggle" id="themeToggle" aria-label="الوضع الليلي">🌙</button>
+         </ul>
+            <button class="theme-toggle" id="themeToggle" aria-label="تبديل الوضع">الوضع الليلي</button>
         </nav>
     </div>
 </header>
 
 <main>
+    
