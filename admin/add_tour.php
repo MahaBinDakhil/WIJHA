@@ -1,15 +1,10 @@
 <?php
 
-/* =====================================================
-   add_tour.php — إضافة جولة جديدة
-   الجزء 3: CRUD
-   ===================================================== */
 
 require_once 'auth.php';
 
 $errors = [];
 
-/* ---------- جلب المدن ---------- */
 
 $citiesResult = $conn->query("
     SELECT id, name
@@ -21,7 +16,6 @@ $cities = $citiesResult
     ? $citiesResult->fetch_all(MYSQLI_ASSOC)
     : [];
 
-/* ---------- القيم الافتراضية ---------- */
 
 $title = '';
 $type = '';
@@ -37,7 +31,6 @@ $priceValue = '';
 $availableSeats = '';
 $isFeatured = 0;
 
-/* ---------- معالجة الإرسال ---------- */
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
@@ -55,7 +48,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $availableSeats = (int)($_POST['available_seats'] ?? 0);
     $isFeatured = isset($_POST['is_featured']) ? 1 : 0;
 
-    /* ---------- التحقق من البيانات ---------- */
 
     if ($title === '') {
         $errors[] = 'الرجاء إدخال اسم الجولة';
@@ -108,7 +100,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors[] = 'عدد المقاعد لا يمكن أن يكون أقل من صفر';
     }
 
-    /* ---------- التحقق من الصورة ---------- */
 
     $imageName = '';
 
@@ -124,13 +115,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $image = $_FILES['image'];
 
-        /* الحد الأقصى 5MB */
 
         if ($image['size'] > 5 * 1024 * 1024) {
             $errors[] = 'حجم الصورة يجب ألا يتجاوز 5MB';
         }
 
-        /* التحقق من نوع الملف الحقيقي */
 
         $finfo = new finfo(FILEINFO_MIME_TYPE);
         $mimeType = $finfo->file($image['tmp_name']);
@@ -155,9 +144,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $extension = $allowedMimeTypes[$mimeType];
 
-            /*
-             * اسم عشوائي للصورة حتى لا تتكرر أسماء الصور
-             */
+        
 
             $imageName = bin2hex(random_bytes(12)) . '.' . $extension;
 
@@ -169,7 +156,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    /* ---------- إضافة الجولة إلى قاعدة البيانات ---------- */
 
     if (!$errors) {
 
@@ -202,11 +188,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         } else {
 
-            /*
-             * 2 أرقام + 9 نصوص + رقم عشري + رقم صحيح
-             * + نص للصورة + رقم صحيح
-             */
-
+           
             $stmt->bind_param(
                 'iisssssssssdisi',
                 $cityId,
@@ -237,10 +219,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             } else {
 
-                /*
-                 * إذا فشلت الإضافة نحذف الصورة التي تم رفعها
-                 * حتى لا تبقى صورة بدون جولة في السيرفر.
-                 */
+                
 
                 if ($imageName !== '') {
                     $uploadedImagePath = __DIR__ . '/../images/' . $imageName;
@@ -258,7 +237,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-/* ---------- إعداد الصفحة ---------- */
 
 $pageTitle = 'إضافة جولة';
 $activePage = 'dashboard';
