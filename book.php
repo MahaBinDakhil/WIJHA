@@ -1,27 +1,20 @@
 <?php
-/* =====================================================
-   book.php — معالجة نموذج الحجز (الجزء 2)
-   يستقبل بيانات الفورم من tour.php ويحفظ الحجز (Create)
-   ما يعرض صفحة — يرجّع لصفحة الجولة برسالة نجاح أو خطأ
-   ===================================================== */
+
 require_once 'includes/db.php';
 
-// الصفحة تشتغل بس لما يجيها فورم (POST)
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: tours.php');
     exit;
 }
 
-// ---------- 1) نقرأ البيانات وننظفها ----------
 $tourId  = (int)($_POST['tour_id'] ?? 0);
 $name    = trim($_POST['customer_name'] ?? '');
 $phone   = trim($_POST['phone'] ?? '');
 $email   = trim($_POST['email'] ?? '');
 $persons = (int)($_POST['persons'] ?? 0);
 
-$back = 'tour.php?id=' . $tourId;   // نرجع لنفس الجولة
+$back = 'tour.php?id=' . $tourId;   
 
-// ---------- 2) نتحقق في السيرفر (حتى لو الـ JS تحقق قبل) ----------
 $error = '';
 if (mb_strlen($name) < 3 || mb_strlen($name) > 100) {
     $error = 'الرجاء إدخال الاسم بشكل صحيح';
@@ -41,12 +34,10 @@ if ($error) {
     exit;
 }
 
-// ---------- 3) نحفظ الحجز وننقص المقاعد ----------
-// نستخدم Transaction: يا الخطوتين ينجحون مع بعض، يا ولا وحدة
+
 try {
     $conn->begin_transaction();
 
-    // نجيب الجولة ونقفل صفها (FOR UPDATE) عشان ما ينحجز نفس المقعد مرتين بنفس اللحظة
     $stmt = $conn->prepare('SELECT title, price, available_seats, tour_date FROM tours WHERE id = ? FOR UPDATE');
     $stmt->bind_param('i', $tourId);
     $stmt->execute();
@@ -60,7 +51,6 @@ try {
         exit;
     }
 
-    // الجولة انتهى موعدها؟
     $today = (new DateTime('today', new DateTimeZone('Asia/Riyadh')))->format('Y-m-d');
     if ($tour['tour_date'] < $today) {
         $conn->rollback();
@@ -76,10 +66,8 @@ try {
         exit;
     }
 
-    // السعر نحسبه هنا من القاعدة — مو من الفورم (أمان)
     $total = $persons * (float)$tour['price'];
 
-    // إضافة الحجز
     $stmt = $conn->prepare('
         INSERT INTO bookings (tour_id, customer_name, phone, email, persons, total_price)
         VALUES (?, ?, ?, ?, ?, ?)
@@ -89,7 +77,6 @@ try {
     $bookingId = $conn->insert_id;
     $stmt->close();
 
-    // إنقاص المقاعد
     $stmt = $conn->prepare('UPDATE tours SET available_seats = available_seats - ? WHERE id = ?');
     $stmt->bind_param('ii', $persons, $tourId);
     $stmt->execute();
@@ -103,8 +90,8 @@ try {
 
 } catch (mysqli_sql_exception $e) {
     $conn->rollback();
-    error_log('Booking failed: ' . $e->getMessage());   // الخطأ الحقيقي للمطورات بس
-    set_flash('error', 'عذراً، صار خطأ أثناء الحجز. حاولي مرة ثانية.');
+    error_log('Booking failed: ' . $e->getMessage());   
+    set_flash('error', 'عذراً، صار خطأ أثناء الحجز. حاول مرة ثانية.');
     header('Location: ' . $back . '#booking');
     exit;
 }
