@@ -45,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$pageTitle  = 'دخول المشرفات';
+$pageTitle  = 'دخول الإدارة';
 $activePage = 'login';
 $base       = '../';
 require_once __DIR__ . '/../includes/header.php';
@@ -86,7 +86,7 @@ require_once __DIR__ . '/../includes/header.php';
                             <input type="password" id="password" name="password" class="form-control"
                                    autocomplete="current-password">
                             <span class="error-msg">الرجاء إدخال كلمة المرور</span>
-                            <button type="button" class="toggle-password" id="togglePassword" aria-label="إظهار كلمة المرور">👁</button>
+                            <button type="button" class="toggle-password" id="togglePassword" aria-label="إظهار كلمة المرور">إظهار</button>
                         </div>
                     </div>
 
