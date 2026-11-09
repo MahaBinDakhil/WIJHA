@@ -1,10 +1,7 @@
 <?php
-/* =====================================================
-   login.php — تسجيل دخول المشرفات
-   ===================================================== */
+
 require_once __DIR__ . '/../includes/db.php';
 
-// إذا هي أصلاً مسجلة دخول → نوديها للوحة التحكم مباشرة
 if (is_admin()) {
     header('Location: dashboard.php');
     exit;
@@ -13,23 +10,20 @@ if (is_admin()) {
 $error    = '';
 $username = '';
 
-// ---------- معالجة النموذج لما ينضغط زر الدخول ----------
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = trim($_POST['username'] ?? '');
     $password = $_POST['password'] ?? '';
 
-    // 1) تحقق في السيرفر (حتى لو الـ JS تحقق قبل — الأمان ما يعتمد على JS)
     if ($username === '' || $password === '') {
         $error = 'الرجاء تعبئة اسم المستخدم وكلمة المرور';
     } else {
-        // 2) نجيب المشرفة من القاعدة بـ Prepared Statement (حماية من SQL Injection)
         $stmt = $conn->prepare('SELECT id, username, password, full_name FROM admins WHERE username = ?');
         $stmt->bind_param('s', $username);
         $stmt->execute();
         $admin = $stmt->get_result()->fetch_assoc();
         $stmt->close();
 
-        // 3) نقارن كلمة المرور بالنسخة المشفرة
         if ($admin && password_verify($password, $admin['password'])) {
             session_regenerate_id(true);              // حماية من سرقة الجلسة
             $_SESSION['admin_id']   = $admin['id'];
@@ -39,7 +33,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             header('Location: dashboard.php');
             exit;
         } else {
-            // رسالة وحدة للحالتين — ما نقول وش الغلط بالضبط (أمان)
             $error = 'اسم المستخدم أو كلمة المرور غير صحيحة';
         }
     }
