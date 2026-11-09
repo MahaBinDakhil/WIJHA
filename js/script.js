@@ -1,12 +1,8 @@
 
-/* =====================================================
-   WIJHA - Shared JavaScript File
-   ===================================================== */
 
 document.addEventListener('DOMContentLoaded', function () {
 
-    /* ---------- Mobile Navigation ---------- */
-
+    /* Mobile Navigation */
     const menuToggle = document.getElementById('menuToggle');
     const mainNav = document.getElementById('mainNav');
 
@@ -18,11 +14,8 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    /* =====================================================
-       Part 1: Home, Tours, and Login
-       ===================================================== */
-
-    /* ---------- Dark Mode ---------- */
+    /* Home, Tours, and Login */
+    /* Dark Mode */
 
     const themeToggle = document.getElementById('themeToggle');
 
@@ -30,7 +23,7 @@ document.addEventListener('DOMContentLoaded', function () {
         document.body.classList.toggle('dark', isDark);
 
         if (themeToggle) {
-            themeToggle.textContent = isDark ? '☀️' : '🌙';
+            themeToggle.textContent = isDark ? 'الوضع النهاري' : 'الوضع الليلي';
         }
     }
 
@@ -61,7 +54,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    /* ---------- Login Form Validation ---------- */
+    /* Login Form Validation */
 
     const loginForm = document.getElementById('loginForm');
 
@@ -96,7 +89,7 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         });
 
-        /* ---------- Password Visibility Toggle ---------- */
+        /* Password Visibility Toggle */
 
         const togglePassword = document.getElementById('togglePassword');
         const passwordInput = document.getElementById('password');
@@ -106,12 +99,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 const show = passwordInput.type === 'password';
 
                 passwordInput.type = show ? 'text' : 'password';
-                togglePassword.textContent = show ? '🙈' : '👁';
+                togglePassword.textContent = show ? 'إخفاء' : 'إظهار';
             });
         }
     }
 
-    /* ---------- Home Page Slider ---------- */
+    /* Home Page Slider */
 
     const slider = document.getElementById('heroSlider');
 
@@ -178,7 +171,7 @@ document.addEventListener('DOMContentLoaded', function () {
         startAuto();
     }
 
-    /* ---------- Tour Filtering and Sorting ---------- */
+    /* Tour Filtering and Sorting */
 
     const toursGrid = document.getElementById('toursGrid');
 
@@ -305,9 +298,7 @@ document.addEventListener('DOMContentLoaded', function () {
         applyFilters();
     }
 
-    /* =====================================================
-       Part 2: Tour Booking Form
-       ===================================================== */
+    /* Part 2: Tour Booking Form */
 
     const bookingForm = document.getElementById('bookingForm');
 
@@ -317,7 +308,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const persons = bookingForm.querySelector('#persons');
         const totalEl = document.getElementById('bookingTotal');
 
-        /* ---------- Update Booking Total ---------- */
+        /* Update Booking Total */
 
         function updateTotal() {
             if (!persons || !totalEl) return;
@@ -334,13 +325,13 @@ document.addEventListener('DOMContentLoaded', function () {
             updateTotal();
         }
 
-        /* ---------- Booking Validation Rules ---------- */
+        /* Booking Validation Rules */
 
         const rules = {
             customer_name: v => {
             if (v.length < 3) return 'الرجاء إدخال الاسم (3 أحرف على الأقل)';
-            const arabic  = /^[\u0621-\u064A\s]+$/;   // حروف عربية ومسافات
-            const english = /^[A-Za-z\s]+$/;          // حروف إنجليزية ومسافات
+            const arabic  = /^[\u0621-\u064A\s]+$/;   // arabic letters
+            const english = /^[A-Za-z\s]+$/;          // english letters
             if (!arabic.test(v) && !english.test(v)) {
             return 'الاسم لازم يكون بالعربي كامل أو بالإنجليزي كامل، بدون أرقام أو رموز';
             }
@@ -393,7 +384,7 @@ document.addEventListener('DOMContentLoaded', function () {
             return message === '';
         }
 
-        /* ---------- Validate Fields on Input ---------- */
+        /* Validate Fields on Input */
 
         Object.keys(rules).forEach(function (name) {
             const input = bookingForm.elements[name];
@@ -413,7 +404,7 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         });
 
-        /* ---------- Validate Before Submission ---------- */
+        /* Validate Before Submission */
 
         bookingForm.addEventListener('submit', function (event) {
             let firstInvalid = null;
@@ -429,21 +420,18 @@ document.addEventListener('DOMContentLoaded', function () {
             });
 
             if (firstInvalid) {
-                e.preventDefault();
+                event.preventDefault();
                 firstInvalid.focus();
                 return;
             }
 
-            // كل شي سليم: نعطل الزر عشان ما ينرسل الحجز مرتين
             const btn = form.querySelector('button[type="submit"]');
             btn.disabled = true;
             btn.textContent = 'جاري الحجز...';
         });
     }
 
-    /* =====================================================
-       Part 3: Image Preview for Add/Edit Tour Forms
-       ===================================================== */
+    /* Image Preview for Add/Edit Tour Forms */
 
     const imageInput = document.getElementById('image');
     const previewContainer = document.getElementById('imagePreviewContainer');
@@ -459,7 +447,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 return;
             }
 
-            /* ---------- Validate Image Type ---------- */
+            /* Validate Image Type */
 
             const allowedTypes = [
                 'image/jpeg',
@@ -468,7 +456,7 @@ document.addEventListener('DOMContentLoaded', function () {
             ];
 
             if (!allowedTypes.includes(file.type)) {
-                alert('نوع الصورة غير مسموح. استخدمي JPG أو PNG أو WEBP.');
+                alert('نوع الصورة غير مسموح. استخدم JPG أو PNG أو WEBP.');
 
                 imageInput.value = '';
                 previewContainer.hidden = true;
@@ -477,7 +465,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 return;
             }
 
-            /* ---------- Validate Image Size ---------- */
+            /* Validate Image Size */
 
             if (file.size > 5 * 1024 * 1024) {
                 alert('حجم الصورة يجب ألا يتجاوز 5MB.');
@@ -489,7 +477,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 return;
             }
 
-            /* ---------- Display Image Preview ---------- */
+            /* Display Image Preview */
 
             const reader = new FileReader();
 
@@ -510,10 +498,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    /* =====================================================
-       Part 4: Delete Confirmation
-       Supports Tour and Booking Delete Forms
-       ===================================================== */
+    /* Delete Confirmation Supports Tour and Booking Delete Forms */
 
     document.querySelectorAll('form[data-confirm]').forEach(function (form) {
         form.addEventListener('submit', function (event) {
