@@ -17,7 +17,7 @@ try {
     if (DB_SSL) {
         $conn->ssl_set(null, null, null, null, null);
     }
-    $conn->real_connect(DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_PORT, null, $flags);
+    @$conn->real_connect(DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_PORT, null, $flags);
     $conn->set_charset('utf8mb4');   
 } catch (mysqli_sql_exception $e) {
     error_log('DB connection failed: ' . $e->getMessage());
