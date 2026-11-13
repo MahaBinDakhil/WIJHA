@@ -358,6 +358,8 @@ body.dark .eyebrow { color: #a9c98c; }
 .card-img .badge-full, .card-img .badge-few { right: auto; left: 12px; }
 .badge-full { background: var(--danger); color: #fff; }
 .badge-few  { background: #f3d9a4; color: #6b4a0e; }
+.card-img .badge-featured { right: auto; left: 12px; }
+.badge-featured { background: var(--primary); color: #fff; }
 .tour-card.hide { display: none; }
 .empty-state { text-align: center; padding: 60px 20px; }
 .empty-state > span { font-size: 3rem; display: block; margin-bottom: 8px; }
