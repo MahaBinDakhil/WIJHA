@@ -10,7 +10,7 @@ require_once 'includes/db.php';
 // الجولات المنتهية تنزل آخر القائمة، والباقي حسب الأقرب موعداً
 $tours = $conn->query("
     SELECT t.id, t.title, t.type, t.short_desc, t.image, t.tour_date,
-           t.duration, t.price, t.available_seats, t.city_id,
+           t.duration, t.price, t.available_seats, t.city_id, t.is_featured,
            c.name AS city_name
     FROM tours t
     JOIN cities c ON c.id = t.city_id
@@ -94,7 +94,9 @@ require_once 'includes/header.php';
                         <?php elseif ((int)$tour['available_seats'] === 0): ?>
                             <span class="badge badge-full">مكتملة</span>
                         <?php elseif ((int)$tour['available_seats'] <= 5): ?>
-                            <span class="badge badge-few">باقي <?= (int)$tour['available_seats'] ?> مقاعد</span>
+                             <span class="badge badge-few">باقي <?= (int)$tour['available_seats'] ?> مقاعد</span>
+                        <?php elseif ((int)$tour['is_featured'] === 1): ?>
+                            <span class="badge badge-featured">⭐ مميزة</span>
                         <?php endif; ?>
                     </div>
                     <div class="card-body">
