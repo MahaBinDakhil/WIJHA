@@ -1,6 +1,7 @@
 <?php
 if (!file_exists(__DIR__ . '/config.php')) {
-    die('<p style="font-family:sans-serif;text-align:center;margin-top:50px">ناقص ملف includes/config.php — انسخي config.example.php وسمّيه config.php وعبّي بيانات الاتصال.</p>');
+    error_log('Missing includes/config.php — copy config.example.php and fill in the connection details.');
+    die('<p style="font-family:sans-serif;text-align:center;margin-top:50px">عذراً، الموقع غير متاح حالياً. يرجى المحاولة لاحقاً.</p>');
 }
 require_once __DIR__ . '/config.php';
 
