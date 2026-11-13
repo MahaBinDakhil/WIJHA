@@ -139,6 +139,9 @@ require_once 'includes/header.php';
                     <div class="card-img">
                         <img src="images/<?= e($tour['image']) ?>" alt="<?= e($tour['title']) ?>" loading="lazy">
                         <span class="badge"><?= e($tour['type']) ?></span>
+                        <?php if ((int)$tour['is_featured'] === 1): ?>
+                            <span class="badge badge-featured">⭐ مميزة</span>
+                        <?php endif; ?>
                     </div>
                     <div class="card-body">
                         <h3><?= e($tour['title']) ?></h3>
