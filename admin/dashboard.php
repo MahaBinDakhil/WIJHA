@@ -25,6 +25,7 @@ $tours = $conn->query("
         t.title,
         t.image,
         t.type,
+        t.is_featured,
         t.tour_date,
         t.price,
         t.available_seats,
@@ -136,7 +137,7 @@ require_once __DIR__ . '/../includes/header.php';
                             </td>
 
                             <td>
-                                <strong><?= e($t['title']) ?></strong>
+                                <strong><?= (int)$t['is_featured'] === 1 ? '⭐ ' : '' ?><?= e($t['title']) ?></strong>
                                 <br>
                                 <span class="badge">
                                     <?= e($t['type']) ?>
