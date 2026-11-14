@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->close();
 
         if ($admin && password_verify($password, $admin['password'])) {
-            session_regenerate_id(true);              // حماية من سرقة الجلسة
+            session_regenerate_id(true);
             $_SESSION['admin_id']   = $admin['id'];
             $_SESSION['admin_name'] = $admin['full_name'] ?: $admin['username'];
 

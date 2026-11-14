@@ -1,20 +1,13 @@
 <?php
-/* =====================================================
-   admin/bookings.php — إدارة الحجوزات (الجزء 2)
-   Read: عرض كل الحجوزات مع فلترة حسب الحالة
-   Update: تأكيد / إلغاء الحجز
-   Delete: حذف الحجز (مع تأكيد)
-   ===================================================== */
-require_once 'auth.php';   // ← حماية: لازم تسجيل دخول
+
+require_once 'auth.php';
 
 $statuses = ['جديد', 'مؤكد', 'ملغي'];
 
-/* ---------- معالجة الأزرار (تأكيد / إلغاء / حذف) ---------- */
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $bookingId = (int)($_POST['id'] ?? 0);
     $action    = $_POST['action'] ?? '';
 
-    // نرجع لنفس الفلتر اللي كانت عليه المشرفة
     $redirect = 'bookings.php';
     if (isset($_GET['status']) && in_array($_GET['status'], $statuses, true)) {
         $redirect .= '?status=' . urlencode($_GET['status']);
@@ -23,7 +16,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $conn->begin_transaction();
 
-        // نجيب الحجز ونقفل صفه
         $stmt = $conn->prepare('SELECT tour_id, persons, status FROM bookings WHERE id = ? FOR UPDATE');
         $stmt->bind_param('i', $bookingId);
         $stmt->execute();
@@ -34,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             throw new RuntimeException('الحجز غير موجود');
         }
 
-        $returnSeats = false;   // هل نرجّع المقاعد للجولة؟
+        $returnSeats = false;
 
         switch ($action) {
             case 'confirm':
@@ -64,7 +56,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt = $conn->prepare('DELETE FROM bookings WHERE id = ?');
                 $stmt->bind_param('i', $bookingId);
                 $stmt->execute();
-                // إذا الحجز ما كان ملغي، مقاعده لسا محجوزة → نرجعها
                 $returnSeats = ($booking['status'] !== 'ملغي');
                 $msg = 'تم حذف الحجز #' . $bookingId;
                 break;
@@ -97,15 +88,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 
-/* ---------- عرض الحجوزات ---------- */
-
-// الفلتر من الرابط: bookings.php?status=جديد
 $filter = $_GET['status'] ?? '';
 if (!in_array($filter, $statuses, true)) {
     $filter = '';
 }
 
-// عدد الحجوزات لكل حالة (للأزرار فوق الجدول)
 $counts = ['جديد' => 0, 'مؤكد' => 0, 'ملغي' => 0];
 $result = $conn->query('SELECT status, COUNT(*) AS n FROM bookings GROUP BY status');
 while ($row = $result->fetch_assoc()) {
@@ -113,7 +100,6 @@ while ($row = $result->fetch_assoc()) {
 }
 $total = array_sum($counts);
 
-// الحجوزات مع اسم الجولة وتاريخها
 $sql = '
     SELECT b.*, t.title AS tour_title, t.tour_date
     FROM bookings b
@@ -128,7 +114,6 @@ if ($filter) {
     $bookings = $conn->query($sql . ' ORDER BY b.created_at DESC')->fetch_all(MYSQLI_ASSOC);
 }
 
-// لون كل حالة
 $statusClass = ['جديد' => 'status-new', 'مؤكد' => 'status-confirmed', 'ملغي' => 'status-cancelled'];
 
 $pageTitle  = 'إدارة الحجوزات';
@@ -152,7 +137,6 @@ require_once __DIR__ . '/../includes/header.php';
             </div>
         </div>
 
-        <!-- فلترة حسب الحالة -->
         <div class="type-chips bookings-filter">
             <a href="bookings.php" class="chip <?= $filter === '' ? 'active' : '' ?>">الكل (<?= $total ?>)</a>
             <?php foreach ($statuses as $s): ?>

@@ -1,19 +1,9 @@
 <?php
-/* =====================================================
-   auth.php — حماية صفحات المشرفات
-   -----------------------------------------------------
-   يُكتب في أول أي صفحة داخل admin/ (ما عدا login.php):
 
-       require_once 'auth.php';
-
-   إذا ما فيه مشرفة مسجلة دخول → يرجّعها لصفحة الدخول.
-   بعده يكون متاح: $conn و $_SESSION['admin_id'] و $_SESSION['admin_name']
-   ===================================================== */
-
-require_once __DIR__ . '/../includes/db.php';   // فيه الاتصال + session_start
+require_once __DIR__ . '/../includes/db.php';
 
 if (!is_admin()) {
     set_flash('error', 'لازم تسجلين دخول أول عشان توصلين لهالصفحة');
     header('Location: login.php');
-    exit;   // مهم: يوقف تنفيذ باقي الصفحة
+    exit;
 }

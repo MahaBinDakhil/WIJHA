@@ -1,12 +1,6 @@
 <?php
-/* =====================================================
-   index.php — الصفحة الرئيسية (الجزء 1)
-   سلايدر + نبذة + المدن + الجولات المميزة
-   كل البيانات تنجاب من القاعدة (Read)
-   ===================================================== */
 require_once 'includes/db.php';
 
-// ---------- السلايدر: الجولات المميزة (is_featured = 1) ----------
 $slides = $conn->query("
     SELECT t.id, t.title, t.short_desc, t.image, c.name AS city_name
     FROM tours t JOIN cities c ON c.id = t.city_id
@@ -15,7 +9,6 @@ $slides = $conn->query("
     LIMIT 5
 ")->fetch_all(MYSQLI_ASSOC);
 
-// إذا ما فيه جولات مميزة، ناخذ أول 5 جولات عشان السلايدر ما يطلع فاضي
 if (!$slides) {
     $slides = $conn->query("
         SELECT t.id, t.title, t.short_desc, t.image, c.name AS city_name
@@ -24,7 +17,6 @@ if (!$slides) {
     ")->fetch_all(MYSQLI_ASSOC);
 }
 
-// ---------- المدن + عدد الجولات في كل مدينة ----------
 $cities = $conn->query("
     SELECT c.id, c.name, c.description, c.image, COUNT(t.id) AS tours_count
     FROM cities c LEFT JOIN tours t ON t.city_id = c.id
@@ -32,7 +24,6 @@ $cities = $conn->query("
     ORDER BY tours_count DESC
 ")->fetch_all(MYSQLI_ASSOC);
 
-// ---------- أقرب 3 جولات قادمة ----------
 $upcoming = $conn->query("
     SELECT t.*, c.name AS city_name
     FROM tours t JOIN cities c ON c.id = t.city_id
@@ -46,7 +37,6 @@ $activePage = 'home';
 require_once 'includes/header.php';
 ?>
 
-<!-- ========== 1) السلايدر ========== -->
 <section class="hero-slider" id="heroSlider">
     <?php foreach ($slides as $i => $s): ?>
         <div class="slide <?= $i === 0 ? 'active' : '' ?>">
@@ -71,7 +61,6 @@ require_once 'includes/header.php';
     <?php endif; ?>
 </section>
 
-<!-- ========== 2) نبذة عن المنصة ========== -->
 <section class="section">
     <div class="container">
         <div class="about-grid">
@@ -102,7 +91,6 @@ require_once 'includes/header.php';
     </div>
 </section>
 
-<!-- ========== 3) المدن ========== -->
 <section class="section section-sand">
     <div class="container">
         <h2 class="section-title text-center">وجهات المملكة</h2>
@@ -122,7 +110,6 @@ require_once 'includes/header.php';
     </div>
 </section>
 
-<!-- ========== 4) الجولات القادمة ========== -->
 <section class="section">
     <div class="container">
         <div class="section-head">

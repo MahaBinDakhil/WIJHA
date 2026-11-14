@@ -1,21 +1,12 @@
-
 <?php
 
-/* =====================================================
-   delete_tour.php - Delete a tour
-   ===================================================== */
-
 require_once 'auth.php';
-
-/* ---------- Validate request method ---------- */
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     set_flash('error', 'Invalid request method');
     header('Location: dashboard.php');
     exit;
 }
-
-/* ---------- Get tour ID ---------- */
 
 $tourId = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
 
@@ -24,8 +15,6 @@ if (!$tourId || $tourId <= 0) {
     header('Location: dashboard.php');
     exit;
 }
-
-/* ---------- Check whether the tour exists ---------- */
 
 $stmt = $conn->prepare(
     "SELECT id FROM tours WHERE id = ? LIMIT 1"
@@ -50,8 +39,6 @@ if (!$tour) {
     header('Location: dashboard.php');
     exit;
 }
-
-/* ---------- Delete the tour ---------- */
 
 $stmt = $conn->prepare(
     "DELETE FROM tours WHERE id = ?"

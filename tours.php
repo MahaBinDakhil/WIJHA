@@ -1,13 +1,6 @@
 <?php
-/* =====================================================
-   tours.php — معرض الجولات + الفلترة (الجزء 1)
-   PHP يجيب كل الجولات من القاعدة (Read)
-   JavaScript يفلترها مباشرة بدون إعادة تحميل الصفحة
-   ===================================================== */
 require_once 'includes/db.php';
 
-// كل الجولات مع اسم المدينة
-// الجولات المنتهية تنزل آخر القائمة، والباقي حسب الأقرب موعداً
 $tours = $conn->query("
     SELECT t.id, t.title, t.type, t.short_desc, t.image, t.tour_date,
            t.duration, t.price, t.available_seats, t.city_id, t.is_featured,
@@ -17,16 +10,12 @@ $tours = $conn->query("
     ORDER BY (t.tour_date < CURDATE()), t.tour_date
 ")->fetch_all(MYSQLI_ASSOC);
 
-// المدن لقائمة الفلترة
 $cities = $conn->query("SELECT id, name FROM cities ORDER BY name")->fetch_all(MYSQLI_ASSOC);
 
-// الأنواع (نفس قيم ENUM في القاعدة)
 $types = ['تاريخية', 'طبيعة', 'مغامرات', 'ثقافية'];
 
-// إذا جاية من الرئيسية بالضغط على مدينة: tours.php?city=3
 $selectedCity = isset($_GET['city']) ? (int)$_GET['city'] : 0;
 
-// تاريخ اليوم بتوقيت السعودية — عشان نعرف الجولات المنتهية
 $today = (new DateTime('today', new DateTimeZone('Asia/Riyadh')))->format('Y-m-d');
 
 $pageTitle  = 'الجولات';
@@ -44,7 +33,6 @@ require_once 'includes/header.php';
 <section class="section">
     <div class="container">
 
-        <!-- ========== أدوات الفلترة ========== -->
         <div class="filters" id="filters">
             <div class="filter-search">
                 <input type="search" id="searchInput" class="form-control" placeholder="🔍 ابحث باسم الجولة...">
@@ -75,11 +63,9 @@ require_once 'includes/header.php';
 
         <p class="results-count muted" id="resultsCount"></p>
 
-        <!-- ========== البطاقات ========== -->
         <div class="cards-grid" id="toursGrid">
             <?php foreach ($tours as $tour): ?>
                 <?php $isExpired = $tour['tour_date'] < $today; ?>
-                <!-- data-* تحفظ بيانات الجولة عشان الـ JS يفلتر ويرتب عليها -->
                 <article class="card tour-card <?= $isExpired ? 'is-expired' : '' ?>"
                          data-city="<?= (int)$tour['city_id'] ?>"
                          data-type="<?= e($tour['type']) ?>"
@@ -116,7 +102,6 @@ require_once 'includes/header.php';
             <?php endforeach; ?>
         </div>
 
-        <!-- تظهر لما ما فيه نتائج -->
         <div class="empty-state" id="emptyState" hidden>
             <span>🏜️</span>
             <h3>ما لقينا جولات تطابق بحثك</h3>

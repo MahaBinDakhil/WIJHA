@@ -1,15 +1,8 @@
 <?php
 
-/* =====================================================
-   edit_tour.php — تعديل جولة
-   الجزء 3: CRUD
-   ===================================================== */
-
 require_once 'auth.php';
 
 $errors = [];
-
-/* ---------- الحصول على رقم الجولة ---------- */
 
 $tourId = (int)($_GET['id'] ?? $_POST['id'] ?? 0);
 
@@ -18,8 +11,6 @@ if ($tourId <= 0) {
     header('Location: dashboard.php');
     exit;
 }
-
-/* ---------- جلب بيانات الجولة ---------- */
 
 $stmt = $conn->prepare("
     SELECT *
@@ -42,8 +33,6 @@ if (!$tour) {
     exit;
 }
 
-/* ---------- جلب المدن ---------- */
-
 $citiesResult = $conn->query("
     SELECT id, name
     FROM cities
@@ -53,8 +42,6 @@ $citiesResult = $conn->query("
 $cities = $citiesResult
     ? $citiesResult->fetch_all(MYSQLI_ASSOC)
     : [];
-
-/* ---------- القيم الحالية ---------- */
 
 $title = $tour['title'];
 $type = $tour['type'];
@@ -71,8 +58,6 @@ $availableSeats = (int)$tour['available_seats'];
 $isFeatured = (int)$tour['is_featured'];
 $currentImage = $tour['image'];
 
-/* ---------- معالجة التعديل ---------- */
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $title = trim($_POST['title'] ?? '');
@@ -88,8 +73,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $priceValue = trim($_POST['price'] ?? '');
     $availableSeats = (int)($_POST['available_seats'] ?? 0);
     $isFeatured = isset($_POST['is_featured']) ? 1 : 0;
-
-    /* ---------- التحقق من البيانات ---------- */
 
     if ($title === '') {
         $errors[] = 'الرجاء إدخال اسم الجولة';
@@ -146,8 +129,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors[] = 'عدد المقاعد لا يمكن أن يكون أقل من صفر';
     }
 
-    /* ---------- الصورة الجديدة ---------- */
-
     $newImageName = $currentImage;
     $uploadedNewImage = false;
 
@@ -164,13 +145,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $image = $_FILES['image'];
 
-            /* الحد الأقصى 5MB */
-
             if ($image['size'] > 5 * 1024 * 1024) {
                 $errors[] = 'حجم الصورة يجب ألا يتجاوز 5MB';
             }
-
-            /* التحقق من نوع الملف الحقيقي */
 
             $finfo = new finfo(FILEINFO_MIME_TYPE);
             $mimeType = $finfo->file($image['tmp_name']);
@@ -184,8 +161,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!isset($allowedMimeTypes[$mimeType])) {
                 $errors[] = 'نوع الصورة غير مسموح. استخدمي JPG أو PNG أو WEBP';
             }
-
-            /* ---------- حفظ الصورة الجديدة ---------- */
 
             if (!$errors) {
 
@@ -219,8 +194,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
     }
-
-    /* ---------- تحديث الجولة ---------- */
 
     if (!$errors) {
 
@@ -271,11 +244,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if ($stmt->execute()) {
 
-                /*
-                 * إذا تم رفع صورة جديدة بنجاح،
-                 * نحذف الصورة القديمة بعد نجاح التعديل.
-                 */
-
                 if (
                     $uploadedNewImage &&
                     $currentImage !== '' &&
@@ -299,11 +267,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             } else {
 
-                /*
-                 * إذا فشل التحديث نحذف الصورة الجديدة
-                 * حتى لا تبقى صورة بدون استخدام.
-                 */
-
                 if ($uploadedNewImage) {
 
                     $newImagePath =
@@ -321,8 +284,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
-
-/* ---------- إعداد الصفحة ---------- */
 
 $pageTitle = 'تعديل جولة';
 $activePage = 'dashboard';

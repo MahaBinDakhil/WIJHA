@@ -1,13 +1,7 @@
 <?php
-/* =====================================================
-   dashboard.php - Admin Dashboard
-   Displays statistics and all tours
-   Provides links for editing and deleting tours
-   ===================================================== */
 
-require_once 'auth.php'; // Require admin authentication
+require_once 'auth.php';
 
-// ---------- Statistics ----------
 $adminId = (int)$_SESSION['admin_id'];
 
 $stats = $conn->query("
@@ -18,7 +12,6 @@ $stats = $conn->query("
         (SELECT COUNT(*) FROM tours WHERE created_by = $adminId) AS my_tours
 ")->fetch_assoc();
 
-// ---------- Get all tours with city and admin names ----------
 $tours = $conn->query("
     SELECT
         t.id,
@@ -68,7 +61,6 @@ require_once __DIR__ . '/../includes/header.php';
             </div>
         </div>
 
-        <!-- Statistics Cards -->
         <div class="stats-grid">
 
             <div class="stat-card">
@@ -99,7 +91,6 @@ require_once __DIR__ . '/../includes/header.php';
 
         <h2 class="section-title">الجولات</h2>
 
-        <!-- Tours Table -->
         <div class="table-wrap">
             <table class="table">
 
@@ -167,7 +158,6 @@ require_once __DIR__ . '/../includes/header.php';
                             <td>
                                 <div class="actions">
 
-                                    <!-- Edit Tour -->
                                     <a
                                         href="edit_tour.php?id=<?= (int)$t['id'] ?>"
                                         class="btn btn-sm"
@@ -175,7 +165,6 @@ require_once __DIR__ . '/../includes/header.php';
                                         تعديل
                                     </a>
 
-                                    <!-- Delete Tour -->
                                     <form
                                         method="POST"
                                         action="delete_tour.php"

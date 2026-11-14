@@ -1,13 +1,8 @@
 <?php
-/* =====================================================
-   tour.php — تفاصيل الجولة + نموذج الحجز (الجزء 2)
-   ===================================================== */
 require_once 'includes/db.php';
 
-// رقم الجولة من الرابط: tour.php?id=7
 $id = (int)($_GET['id'] ?? 0);
 
-// نجيب الجولة مع اسم مدينتها (Prepared Statement)
 $stmt = $conn->prepare("
     SELECT t.*, c.name AS city_name
     FROM tours t
@@ -19,17 +14,13 @@ $stmt->execute();
 $tour = $stmt->get_result()->fetch_assoc();
 
 if ($tour) {
-    // نقسم البرنامج على "-" عشان نعرضه خطوات مرقمة
     $steps    = array_filter(array_map('trim', preg_split('/\s*-\s*/u', $tour['itinerary'] ?? '')));
-    // نقسم "يشمل" على الفاصلة العربية
     $includes = array_filter(array_map('trim', explode('،', $tour['includes'] ?? '')));
     $seats    = (int)$tour['available_seats'];
 
-    // هل تاريخ الجولة راح؟ (نقارن بتاريخ اليوم بتوقيت السعودية)
     $today   = (new DateTime('today', new DateTimeZone('Asia/Riyadh')))->format('Y-m-d');
     $expired = $tour['tour_date'] < $today;
 
-    // الحجز متاح بس إذا فيه مقاعد والجولة ما انتهت
     $canBook = $seats > 0 && !$expired;
 }
 
@@ -58,7 +49,6 @@ require_once 'includes/header.php';
       <a href="tours.php">الجولات</a> / <?= e($tour['city_name']) ?> / <?= e($tour['title']) ?>
     </nav>
 
-    <!-- الصورة مع العنوان فوقها -->
     <div class="tour-hero">
       <img src="images/<?= e($tour['image']) ?>" alt="<?= e($tour['title']) ?>">
       <div class="tour-hero-content">
@@ -71,7 +61,6 @@ require_once 'includes/header.php';
       </div>
     </div>
 
-    <!-- شريط المعلومات السريعة -->
     <div class="tour-facts-grid">
       <div class="card tour-fact">
         <span class="tour-fact-icon">📅</span>
@@ -93,7 +82,6 @@ require_once 'includes/header.php';
 
     <div class="tour-layout">
 
-      <!-- المحتوى -->
       <article class="card tour-main">
         <h2>عن الجولة</h2>
         <p class="tour-desc"><?= e($tour['description']) ?></p>
@@ -120,7 +108,6 @@ require_once 'includes/header.php';
         <p>📍 <?= e($tour['meeting_point']) ?></p>
       </article>
 
-      <!-- بطاقة السعر -->
       <aside class="card tour-sidebar">
         <small class="muted">السعر للشخص</small>
         <span class="price"><?= price($tour['price']) ?></span>
@@ -150,7 +137,6 @@ require_once 'includes/header.php';
 
     </div>
 
-    <!-- نموذج الحجز -->
     <?php if ($canBook): ?>
     <div class="card booking-box" id="booking">
       <h2>احجز مقعدك</h2>
