@@ -136,14 +136,6 @@ wijha/
 
 ---
 
-## 🎓 Course
-
-**CSC457 – Internet Technologies** · Section 60699
-Prepared for **Dr. Mona AlMofarreh**
-King Saud University · 1st Semester 1448 (2026)
-
----
-
 <div align="center">
 
 Made with 🧭 to help people discover Saudi Arabia
