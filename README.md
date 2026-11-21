@@ -90,36 +90,10 @@ The database is a MySQL database hosted in the cloud on **Aiven**. All tables us
 
 ## 🚀 Running It Locally
 
-**Requirements:** [XAMPP](https://www.apachefriends.org/) (Apache + PHP 8) and a MySQL database, either local or in the cloud.
-
-1. **Clone the project** into your web folder:
-   ```bash
-   cd C:\xampp\htdocs
-   git clone https://github.com/MahaBinDakhil/WIJHA.git wijha
-   ```
-2. **Create the database:** import `database.sql` in phpMyAdmin (**Import →** choose the file).
-   The file creates a database called `rihla_db`. If your host gives you a single ready-made database (like Aiven's `defaultdb`), delete the `CREATE DATABASE` and `USE` lines at the top of the file before importing.
-3. **Add your connection details** in `includes/config.php`. Replace the `*****` placeholders with your real values:
-   ```php
-   define('DB_HOST', 'localhost');   // or your cloud host
-   define('DB_PORT', 3306);          // a number, no quotes
-   define('DB_USER', 'root');
-   define('DB_PASS', '');
-   define('DB_NAME', 'rihla_db');    // the database you imported into
-   define('DB_SSL',  false);         // true for cloud databases like Aiven
-   ```
-   > ⚠️ Never commit your real password to GitHub.
-4. **Start Apache** from the XAMPP control panel (start MySQL too if your database is local).
-5. **Open** `http://localhost/wijha/` in your browser.
-
-**Sample admin account** (created by `database.sql`):
-
-| Username | Password |
-|---|---|
-| `admin` | `Admin@123` |
-
-The admin panel is at `/admin/login.php`.
-
+1. Put the project in `C:\xampp\htdocs\wijha` and start **Apache** from XAMPP.
+2. Import `database.sql` into a MySQL database.
+3. Fill in your connection details in `includes/config.php`.
+4. Open `http://localhost/wijha/` and log in to `/admin/login.php` with the sample account `admin` / `Admin@123`.
 ---
 
 ## 📁 Project Structure
